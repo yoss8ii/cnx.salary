@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#111420">
-<title>Calculateur de Salaire — Concentrix (Version Bureau)</title>
+<title>Simulateur de Salaire</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
@@ -250,6 +250,48 @@
         outline: none;
     }
 
+    /* Masquage des flèches natives du navigateur (remplacées par le stepper) */
+    .field input[type="number"]::-webkit-inner-spin-button,
+    .field input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .field input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    /* ===== Stepper personnalisé (+/-) ===== */
+    .stepper {
+        flex: none;
+        width: 26px;
+        display: flex;
+        flex-direction: column;
+        border-radius: var(--r-sm);
+        overflow: hidden;
+        border: 1px solid var(--border-strong);
+    }
+
+    .stepper-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+        background: var(--card-2);
+        border: none;
+        color: var(--text-soft);
+        cursor: pointer;
+        padding: 0;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .stepper-btn.up { border-bottom: 1px solid var(--border); }
+
+    .stepper-btn:hover { background: var(--violet); color: #fff; }
+    .stepper-btn:active { background: var(--violet-2); }
+
+    .stepper-btn svg { width: 9px; height: 9px; flex: none; }
+
     .field select {
         text-align: left;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 7.5l4.5 4.5 4.5-4.5' stroke='%23969db3' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -456,9 +498,7 @@
             transform: none !important;
         }
 
-        /* Colonnes alignées : même hauteur, la colonne Bulletin pousse son
-           total final "Net à payer" tout en bas, aligné avec le bas de la
-           colonne Saisie. */
+        /* Colonnes alignées */
         #screen-saisie, #screen-bulletin {
             display: flex;
             flex-direction: column;
@@ -468,8 +508,7 @@
             margin-top: auto;
         }
 
-        /* Sur bureau, on masque le total simple et on affiche la carte
-           "hero" (même style que la version mobile) collée en bas à droite. */
+        /* Sur bureau, on masque le total simple et on affiche la carte "hero" */
         #finalTotalMobile { display: none; }
 
         .hero-card-bottom {
@@ -547,7 +586,7 @@
                 <label for="dimanchesTravailles">Dimanches travaillés</label>
                 <div class="field-control">
                     <input type="number" id="dimanchesTravailles" value="0.000" step="0.001" inputmode="decimal">
-                    <span class="unit">Nbr</span>
+                    <span class="unit">Jrs</span>
                 </div>
             </div>
             <div class="field">
@@ -582,7 +621,7 @@
                 <label for="primeProductivite">Palier prime productivité</label>
                 <div class="field-control">
                     <select id="primeProductivite">
-                        <option value="0">0 % (aucune)</option>
+                        <option value="0">0 %</option>
                         <option value="0.15">15 %</option>
                         <option value="0.165">16.5 %</option>
                         <option value="0.18">18 %</option>
@@ -728,7 +767,9 @@
 </div>
 
 <script>
+
     // Éléments Constantes Ajustables et Fixes
+
     const inBaseSalary = document.getElementById('baseSalaryInput');
     const weeksContainer = document.getElementById('weeksContainer');
     const NB_SEMAINES = 4;
@@ -738,7 +779,6 @@
     const PRESENCE_INDEMNITY = 6.080;
     const TRANSPORT_INDEMNITY = 20.000;
     const LANGUE_PRIME = 250.000;
-
     const PRIME_DIMANCHE = 25.000;
 
     function renderWeekInputs() {
@@ -967,10 +1007,51 @@
     });
 
     // Génération des champs de semaine (fixé à 4 semaines) puis calcul initial
+    // Injection automatique des boutons +/- (stepper) sur tous les champs numériques
+    function attachSteppers(root) {
+        (root || document).querySelectorAll('.field-control input[type="number"]').forEach(inp => {
+            if (inp.dataset.stepperAttached) return;
+            inp.dataset.stepperAttached = "1";
+
+            const stepper = document.createElement('div');
+            stepper.className = 'stepper';
+
+            const up = document.createElement('button');
+            up.type = 'button';
+            up.className = 'stepper-btn up';
+            up.setAttribute('aria-label', 'Augmenter');
+            up.innerHTML = '<svg viewBox="0 0 20 20" fill="none"><path d="M5 12l5-5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+            const down = document.createElement('button');
+            down.type = 'button';
+            down.className = 'stepper-btn down';
+            down.setAttribute('aria-label', 'Diminuer');
+            down.innerHTML = '<svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+            function bump(dir) {
+                const step = parseFloat(inp.step) || 1;
+                const decimals = (inp.step && inp.step.includes('.')) ? inp.step.split('.')[1].length : 0;
+                let val = (parseFloat(inp.value) || 0) + (dir * step);
+                if (inp.min !== "" && val < parseFloat(inp.min)) val = parseFloat(inp.min);
+                if (inp.max !== "" && val > parseFloat(inp.max)) val = parseFloat(inp.max);
+                inp.value = val.toFixed(decimals);
+                inp.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            up.addEventListener('click', () => bump(1));
+            down.addEventListener('click', () => bump(-1));
+
+            stepper.appendChild(up);
+            stepper.appendChild(down);
+            inp.insertAdjacentElement('afterend', stepper);
+        });
+    }
+
     renderWeekInputs();
     calculateSalary();
+    attachSteppers();
 
-    // ===== Navigation par onglets (avec transition d'entrée) =====
+    // ===== Navigation par onglets =====
     const tabButtons = document.querySelectorAll('.tab-btn');
     const screens = { 'screen-saisie': document.getElementById('screen-saisie'), 'screen-bulletin': document.getElementById('screen-bulletin') };
 
