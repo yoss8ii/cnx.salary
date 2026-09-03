@@ -153,7 +153,10 @@
     .dot.gain { background: #baf5df; }
     .dot.deduct { background: #ffd0d8; }
 
-    /* ===== Content ===== */
+    .hero-card-bottom {
+        display: none;
+    }
+
     .content {
         flex: 1;
         padding: 6px 16px 100px;
@@ -433,20 +436,16 @@
             padding-bottom: 40px;
         }
 
-        .hero-wrap {
-            position: static;
-            padding: 28px 28px 6px;
-            background: none;
-        }
-
-        .hero-card { max-width: 560px; }
+        /* Le hero du haut est masqué en bureau : le Net à payer s'affiche
+           désormais en bas à droite, dans le bulletin. */
+        .hero-wrap { display: none; }
 
         .content {
             display: grid;
             grid-template-columns: minmax(380px, 480px) 1fr;
-            align-items: start;
+            align-items: stretch;
             gap: 24px;
-            padding: 6px 28px 40px;
+            padding: 28px 28px 40px;
         }
 
         /* Les deux écrans restent visibles simultanément, sans logique d'onglet */
@@ -457,12 +456,25 @@
             transform: none !important;
         }
 
-        #screen-bulletin {
-            position: sticky;
-            top: 24px;
-            max-height: calc(100vh - 48px);
-            overflow-y: auto;
-            padding-right: 4px;
+        /* Colonnes alignées : même hauteur, la colonne Bulletin pousse son
+           total final "Net à payer" tout en bas, aligné avec le bas de la
+           colonne Saisie. */
+        #screen-saisie, #screen-bulletin {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #screen-bulletin > .ledger-total.final {
+            margin-top: auto;
+        }
+
+        /* Sur bureau, on masque le total simple et on affiche la carte
+           "hero" (même style que la version mobile) collée en bas à droite. */
+        #finalTotalMobile { display: none; }
+
+        .hero-card-bottom {
+            display: block;
+            margin-top: auto;
         }
 
         /* Barre d'onglets flottante inutile en version bureau */
@@ -677,9 +689,22 @@
             <div class="ledger-row deduct"><span class="desc">Reprise avantage nature TR</span><span class="amount">− <span id="outAvTrRetenue">169.000</span> TND</span></div>
         </div>
 
-        <div class="ledger-total final">
+        <div class="ledger-total final" id="finalTotalMobile">
             <span>Net à payer</span>
             <span class="amount"><span id="outNetAPayer">0.000</span> TND</span>
+        </div>
+
+        <div class="hero-card hero-card-bottom" id="heroBottom">
+            <div class="hero-top">
+                <span class="hero-brand">Concentrix</span>
+                <span class="hero-badge">Temps réel</span>
+            </div>
+            <p class="hero-label">Net à payer estimé</p>
+            <div class="hero-value"><span id="outNetAPayerHero2">0.000</span><span class="hero-unit">TND</span></div>
+            <div class="hero-stats">
+                <span class="hero-stat"><span class="dot gain"></span>Brut <strong id="outTotalBrutHero2">0.000</strong></span>
+                <span class="hero-stat"><span class="dot deduct"></span>Retenues <strong id="outRetenuesHero2">0.000</strong></span>
+            </div>
         </div>
     </div>
     </main>
@@ -924,6 +949,9 @@
         document.getElementById('outNetAPayerHero').innerText = netAPayer.toFixed(3);
         document.getElementById('outTotalBrutHero').innerText = totalBrut.toFixed(3);
         document.getElementById('outRetenuesHero').innerText = (totalBrut - netAPayer).toFixed(3);
+        document.getElementById('outNetAPayerHero2').innerText = netAPayer.toFixed(3);
+        document.getElementById('outTotalBrutHero2').innerText = totalBrut.toFixed(3);
+        document.getElementById('outRetenuesHero2').innerText = (totalBrut - netAPayer).toFixed(3);
     }
 
     // Écouteurs d'événements globaux pour mise à jour en temps réel
