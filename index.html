@@ -732,7 +732,7 @@
             <div class="const-row"><span>Prime assiduité (calculée / 220.000 TND ÷ nb semaines)</span><span class="const-value"><span id="outAssiduiteConst">220.000</span> TND</span></div>
             <div class="const-row"><span>Prime langue anglais</span><span class="const-value">250.000 TND</span></div>
             <div class="const-row"><span>Avantage nature TR (22 j. − absences, à 8.000 TND/j)</span><span class="const-value"><span id="outAvTrConst">176.000</span> TND</span></div>
-            <div class="const-row"><span>Avantage nature assurance (17.02% SB)</span><span class="const-value"><span id="outAssuranceConst">0.000</span> TND</span></div>
+            <div class="const-row"><span>Avantage nature assurance (7.55% du Brut)</span><span class="const-value"><span id="outAssuranceConst">0.000</span> TND</span></div>
         </details>
     </div>
 
@@ -918,9 +918,6 @@
         const tauxMajorationNuit = 2.413 * ratio;
         const tauxJournalierBase = 38.606 * ratio;
 
-        // Assurance calculée à 17.02% sur le salaire de base courant
-        const av_ass = currentBaseSalary * 0.1702;
-
         const hrsNuit = parseFloat(inHeuresNuit.value) || 0;
         const nbrDim = parseFloat(inDimanches.value) || 0;
         const jFeries = parseFloat(inJoursFeries.value) || 0;
@@ -972,8 +969,29 @@
         // "Heures manquantes (WFM)" : au taux horaire, car saisi en heures (pas en jours)
         const retenueWfm = hrsWfm * tauxHoraireBase;
 
+        // Assurance Groupe : base = Brut (hors assurance elle-même) × 7.55%
+        // (formule observée sur les bulletins Concentrix)
+        const baseAssurance = (
+            currentBaseSalary +
+            PRESENCE_INDEMNITY +
+            TRANSPORT_INDEMNITY +
+            currentAssiduitePrime +
+            LANGUE_PRIME +
+            valProd +
+            gainNuit +
+            gainDim +
+            gainFerie +
+            gainSup125 +
+            gainSup150 +
+            valRappels +
+            AV_TR -
+            retenueAbs -
+            retenueWfm
+        );
+        const av_ass = baseAssurance * 0.0755;
+
         // Calcul du Salaire Brut Global
-        const totalBrut = currentBaseSalary + PRESENCE_INDEMNITY + TRANSPORT_INDEMNITY + currentAssiduitePrime + LANGUE_PRIME + valProd + gainNuit + gainDim + gainFerie + gainSup125 + gainSup150 + valRappels + AV_TR + av_ass - retenueAbs - retenueWfm;
+        const totalBrut = baseAssurance + av_ass;
 
         // Base de cotisation CNSS et calcul de la charge salariale (9.68%)
         const baseCnss = totalBrut - AV_TR - av_ass;
