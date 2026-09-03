@@ -846,7 +846,7 @@
             row.className = 'field-control';
             row.innerHTML = `
                 <span style="min-width:76px; font-size:13px; color:var(--text-soft);">Semaine ${i + 1}</span>
-                <input type="number" class="week-abs-input" data-week="${i}" value="${previousValues[i] || '0.000'}" step="0.001" inputmode="decimal">
+                <input type="number" class="week-abs-input" data-week="${i}" value="${previousValues[i] || '0.000'}" step="0.001" min="0" inputmode="decimal">
                 <span class="unit">Jrs</span>
             `;
             weeksContainer.appendChild(row);
