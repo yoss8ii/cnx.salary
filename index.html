@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#111420">
-<title>Simulateur de Salaire - CNX</title>
+<title>Simulateur de Salaire</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
@@ -87,17 +87,73 @@
     .hero-brand {
         font-size: 12.5px;
         font-weight: 600;
-        color: rgba(255,255,255,0.75);
+        color: rgba(255,255,255,1);
+    
+    /* Align the text and image vertically */
+        display: inline-flex;
+        align-items: center;
+        gap: 6px; /* Space between logo and text */
     }
 
-    .hero-badge {
-        font-size: 10.5px;
-        font-weight: 600;
-        color: #fff;
-        background: rgba(255,255,255,0.16);
-        padding: 4px 9px;
-        border-radius: 20px;
+    .hero-brand::before {
+        content: "";
+        display: inline-block;
+        width: 17px;  /* Adjust width to fit your logo */
+        height: 17px; /* Adjust height to fit your logo */
+        background-image: url('https://appexchange.salesforce.com/image_host/1403a91d-b255-403f-8e90-3c7017b790da.png');
+        border-radius: 50%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
     }
+
+
+    .hero-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.16);
+    padding: 4px 10px;
+    border-radius: 20px;
+
+    /* Alignement du point et du texte */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    /* Effet glassmorphism */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Le point vert */
+.hero-badge::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background-color: #22c55e; /* Vert Tailwind emerald-500 */
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    animation: pulse-dot 1.8s infinite ease-in-out;
+}
+
+/* Animation d'impulsion */
+@keyframes pulse-dot {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
 
     .hero-label {
         margin: 0 0 2px;
@@ -314,8 +370,7 @@
         background: #fff;
     }
 
-    /* ===== Stepper personnalisé (+/-) ===== */
-    .stepper {
+    /* ===== Stepper personnalisé (+/-) ===== */    .stepper {
         flex: none;
         width: 26px;
         display: flex;
@@ -552,9 +607,7 @@
             transform: none !important;
         }
 
-        /* Colonnes alignées : même hauteur, la colonne Bulletin pousse son
-           total final "Net à payer" tout en bas, aligné avec le bas de la
-           colonne Saisie. */
+        /* Colonnes alignées */
         #screen-saisie, #screen-bulletin {
             display: flex;
             flex-direction: column;
@@ -564,8 +617,7 @@
             margin-top: auto;
         }
 
-        /* Sur bureau, on masque le total simple et on affiche la carte
-           "hero" (même style que la version mobile) collée en bas à droite. */
+        /* Sur bureau, on masque le total simple et on affiche la carte "hero" */
         #finalTotalMobile { display: none; }
 
         .hero-card-bottom {
@@ -595,7 +647,7 @@
         <div class="hero-card">
             <div class="hero-top">
                 <span class="hero-brand">Concentrix</span>
-                <span class="hero-badge">Temps réel</span>
+                <span class="hero-badge">Mise à jour en temps réel</span>
             </div>
             <p class="hero-label">Net à payer estimé</p>
             <div class="hero-value"><span id="outNetAPayerHero">0.000</span><span class="hero-unit">TND</span></div>
@@ -635,42 +687,42 @@
             <div class="field">
                 <label for="heuresNuit">Heures de nuit</label>
                 <div class="field-control">
-                    <input type="number" id="heuresNuit" value="0.000" step="0.001" inputmode="decimal">
+                    <input type="number" id="heuresNuit" value="0.000" min="0" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="dimanchesTravailles">Dimanches travaillés</label>
                 <div class="field-control">
-                    <input type="number" id="dimanchesTravailles" value="0.000" step="0.001" inputmode="decimal">
-                    <span class="unit">Nbr</span>
+                    <input type="number" id="dimanchesTravailles" value="0.000" min="0" max="4" step="0.001" inputmode="decimal">
+                    <span class="unit">Jrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="joursFeries">Jours fériés (150%)</label>
                 <div class="field-control">
-                    <input type="number" id="joursFeries" value="0.000" step="0.001" inputmode="decimal">
+                    <input type="number" id="joursFeries" value="0.000" min="0" step="0.001" inputmode="decimal">
                     <span class="unit">Jrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="hSup125">Heures sup (125%)</label>
                 <div class="field-control">
-                    <input type="number" id="hSup125" value="0.000" step="0.001" inputmode="decimal">
+                    <input type="number" id="hSup125" value="0.000" min="0" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="hSup150">Heures sup (150%)</label>
                 <div class="field-control">
-                    <input type="number" id="hSup150" value="0.000" step="0.001" inputmode="decimal">
+                    <input type="number" id="hSup150" value="0.000" min="0" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="heuresManquantes">Heures manquantes (WFM)</label>
                 <div class="field-control">
-                    <input type="number" id="heuresManquantes" value="0.000" step="0.001" inputmode="decimal">
+                    <input type="number" id="heuresManquantes" value="0.000 "min="0" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
@@ -678,7 +730,7 @@
                 <label for="primeProductivite">Palier prime productivité</label>
                 <div class="field-control">
                     <select id="primeProductivite">
-                        <option value="0">0 % (aucune)</option>
+                        <option value="0">0 %</option>
                         <option value="0.15">15 %</option>
                         <option value="0.165">16.5 %</option>
                         <option value="0.18">18 %</option>
@@ -701,14 +753,14 @@
             <div class="field">
                 <label for="avances">Avances à déduire</label>
                 <div class="field-control">
-                    <input type="number" id="avances" value="0.000" step="0.001" inputmode="decimal">
+                    <input type="number" id="avances" value="0.000" min="0" step="0.001" inputmode="decimal">
                     <span class="unit">TND</span>
                 </div>
             </div>
             <div class="field">
                 <label for="deteriorations">Détériorations / pertes</label>
                 <div class="field-control">
-                    <input type="number" id="deteriorations" value="0.000" step="0.001" inputmode="decimal">
+                    <input type="number" id="deteriorations" value="0.000" min="0" step="0.001" inputmode="decimal">
                     <span class="unit">TND</span>
                 </div>
             </div>
@@ -758,7 +810,7 @@
             <div class="ledger-row"><span class="desc">Prime de langue anglais</span><span class="amount"><span id="outLangue">250.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Prime mensuelle de productivité</span><span class="amount"><span id="outProductivite">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Majoration heures de nuit<span class="base"><span id="outBaseNuit">0.000</span> Hrs</span></span><span class="amount"><span id="outGainNuit">0.000</span> TND</span></div>
-            <div class="ledger-row"><span class="desc">Prime dimanche travaillé<span class="base"><span id="outBaseDim">0.000</span> Nbr</span></span><span class="amount"><span id="outGainDim">0.000</span> TND</span></div>
+            <div class="ledger-row"><span class="desc">Prime dimanche travaillé<span class="base"><span id="outBaseDim">0.000</span> Jrs</span></span><span class="amount"><span id="outGainDim">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Jours fériés rémunérés (150%)<span class="base"><span id="outBaseFerie">0.000</span> Jrs</span></span><span class="amount"><span id="outGainFerie">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Heures supplémentaires (125%)<span class="base"><span id="outBaseSup125">0.000</span> Hrs</span></span><span class="amount"><span id="outGainSup125">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Heures supplémentaires (150%)<span class="base"><span id="outBaseSup150">0.000</span> Hrs</span></span><span class="amount"><span id="outGainSup150">0.000</span> TND</span></div>
@@ -802,7 +854,7 @@
         <div class="hero-card hero-card-bottom" id="heroBottom">
             <div class="hero-top">
                 <span class="hero-brand">Concentrix</span>
-                <span class="hero-badge">Temps réel</span>
+                <span class="hero-badge">Mise à jour en temps réel</span>
             </div>
             <p class="hero-label">Net à payer estimé</p>
             <div class="hero-value"><span id="outNetAPayerHero2">0.000</span><span class="hero-unit">TND</span></div>
@@ -1266,6 +1318,5 @@
     attachSteppers();
     initNavigation();
 </script>
-
 </body>
 </html>
