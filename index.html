@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#111420">
-<title>Simulateur de Salaire</title>
+<title>Calculateur de Salaire — Concentrix (Version Bureau)</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
@@ -87,73 +87,17 @@
     .hero-brand {
         font-size: 12.5px;
         font-weight: 600;
-        color: rgba(255,255,255,1);
-    
-    /* Align the text and image vertically */
-        display: inline-flex;
-        align-items: center;
-        gap: 6px; /* Space between logo and text */
+        color: rgba(255,255,255,0.75);
     }
-
-    .hero-brand::before {
-        content: "";
-        display: inline-block;
-        width: 17px;  /* Adjust width to fit your logo */
-        height: 17px; /* Adjust height to fit your logo */
-        background-image: url('https://appexchange.salesforce.com/image_host/1403a91d-b255-403f-8e90-3c7017b790da.png');
-        border-radius: 50%;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
 
     .hero-badge {
-    font-size: 10.5px;
-    font-weight: 600;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.16);
-    padding: 4px 10px;
-    border-radius: 20px;
-
-    /* Alignement du point et du texte */
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    /* Effet glassmorphism */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Le point vert */
-.hero-badge::before {
-    content: '';
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    background-color: #22c55e; /* Vert Tailwind emerald-500 */
-    border-radius: 50%;
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-    animation: pulse-dot 1.8s infinite ease-in-out;
-}
-
-/* Animation d'impulsion */
-@keyframes pulse-dot {
-    0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+        font-size: 10.5px;
+        font-weight: 600;
+        color: #fff;
+        background: rgba(255,255,255,0.16);
+        padding: 4px 9px;
+        border-radius: 20px;
     }
-    70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
-    }
-    100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-    }
-}
 
     .hero-label {
         margin: 0 0 2px;
@@ -314,6 +258,60 @@
     }
     .field input[type="number"] {
         -moz-appearance: textfield;
+    }
+
+    /* ===== Interrupteur (toggle) — éligibilité à une prime ===== */
+    .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 42px;
+        height: 24px;
+        flex: none;
+        cursor: pointer;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+
+    .switch-track {
+        position: absolute;
+        inset: 0;
+        background: var(--card-2);
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .switch-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        background: var(--text-soft);
+        border-radius: 50%;
+        transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .switch input:checked + .switch-track {
+        background: var(--violet);
+        border-color: var(--violet);
+    }
+
+    .switch input:checked + .switch-track .switch-thumb {
+        transform: translateX(18px);
+        background: #fff;
     }
 
     /* ===== Stepper personnalisé (+/-) ===== */
@@ -554,7 +552,9 @@
             transform: none !important;
         }
 
-        /* Colonnes alignées */
+        /* Colonnes alignées : même hauteur, la colonne Bulletin pousse son
+           total final "Net à payer" tout en bas, aligné avec le bas de la
+           colonne Saisie. */
         #screen-saisie, #screen-bulletin {
             display: flex;
             flex-direction: column;
@@ -564,7 +564,8 @@
             margin-top: auto;
         }
 
-        /* Sur bureau, on masque le total simple et on affiche la carte "hero" */
+        /* Sur bureau, on masque le total simple et on affiche la carte
+           "hero" (même style que la version mobile) collée en bas à droite. */
         #finalTotalMobile { display: none; }
 
         .hero-card-bottom {
@@ -594,7 +595,7 @@
         <div class="hero-card">
             <div class="hero-top">
                 <span class="hero-brand">Concentrix</span>
-                <span class="hero-badge">Mise à jour en temps réel</span>
+                <span class="hero-badge">Temps réel</span>
             </div>
             <p class="hero-label">Net à payer estimé</p>
             <div class="hero-value"><span id="outNetAPayerHero">0.000</span><span class="hero-unit">TND</span></div>
@@ -634,42 +635,42 @@
             <div class="field">
                 <label for="heuresNuit">Heures de nuit</label>
                 <div class="field-control">
-                    <input type="number" id="heuresNuit" value="0.000" min="0" step="0.001" inputmode="decimal">
+                    <input type="number" id="heuresNuit" value="0.000" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="dimanchesTravailles">Dimanches travaillés</label>
                 <div class="field-control">
-                    <input type="number" id="dimanchesTravailles" value="0.000" min="0" max="4" step="0.001" inputmode="decimal">
-                    <span class="unit">Jrs</span>
+                    <input type="number" id="dimanchesTravailles" value="0.000" step="0.001" inputmode="decimal">
+                    <span class="unit">Nbr</span>
                 </div>
             </div>
             <div class="field">
                 <label for="joursFeries">Jours fériés (150%)</label>
                 <div class="field-control">
-                    <input type="number" id="joursFeries" value="0.000" min="0" step="0.001" inputmode="decimal">
+                    <input type="number" id="joursFeries" value="0.000" step="0.001" inputmode="decimal">
                     <span class="unit">Jrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="hSup125">Heures sup (125%)</label>
                 <div class="field-control">
-                    <input type="number" id="hSup125" value="0.000" min="0" step="0.001" inputmode="decimal">
+                    <input type="number" id="hSup125" value="0.000" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="hSup150">Heures sup (150%)</label>
                 <div class="field-control">
-                    <input type="number" id="hSup150" value="0.000" min="0" step="0.001" inputmode="decimal">
+                    <input type="number" id="hSup150" value="0.000" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
             <div class="field">
                 <label for="heuresManquantes">Heures manquantes (WFM)</label>
                 <div class="field-control">
-                    <input type="number" id="heuresManquantes" value="0.000 "min="0" step="0.001" inputmode="decimal">
+                    <input type="number" id="heuresManquantes" value="0.000" step="0.001" inputmode="decimal">
                     <span class="unit">Hrs</span>
                 </div>
             </div>
@@ -677,7 +678,7 @@
                 <label for="primeProductivite">Palier prime productivité</label>
                 <div class="field-control">
                     <select id="primeProductivite">
-                        <option value="0">0 %</option>
+                        <option value="0">0 % (aucune)</option>
                         <option value="0.15">15 %</option>
                         <option value="0.165">16.5 %</option>
                         <option value="0.18">18 %</option>
@@ -700,14 +701,14 @@
             <div class="field">
                 <label for="avances">Avances à déduire</label>
                 <div class="field-control">
-                    <input type="number" id="avances" value="0.000" min="0" step="0.001" inputmode="decimal">
+                    <input type="number" id="avances" value="0.000" step="0.001" inputmode="decimal">
                     <span class="unit">TND</span>
                 </div>
             </div>
             <div class="field">
                 <label for="deteriorations">Détériorations / pertes</label>
                 <div class="field-control">
-                    <input type="number" id="deteriorations" value="0.000" min="0" step="0.001" inputmode="decimal">
+                    <input type="number" id="deteriorations" value="0.000" step="0.001" inputmode="decimal">
                     <span class="unit">TND</span>
                 </div>
             </div>
@@ -730,7 +731,16 @@
             <div class="const-row"><span>Indemnité de présence</span><span class="const-value">6.080 TND</span></div>
             <div class="const-row"><span>Indemnité de transport</span><span class="const-value">20.000 TND</span></div>
             <div class="const-row"><span>Prime assiduité (calculée / 220.000 TND ÷ nb semaines)</span><span class="const-value"><span id="outAssiduiteConst">220.000</span> TND</span></div>
-            <div class="const-row"><span>Prime langue anglais</span><span class="const-value">250.000 TND</span></div>
+            <div class="field toggle-row">
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                    <label for="langueEligible" style="margin:0;">Prime de langue anglais</label>
+                    <span style="font-size:11px; color:var(--text-faint);">250.000 TND si éligible</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="langueEligible" checked>
+                    <span class="switch-track"><span class="switch-thumb"></span></span>
+                </label>
+            </div>
             <div class="const-row"><span>Avantage nature TR (22 j. − absences, à 8.000 TND/j)</span><span class="const-value"><span id="outAvTrConst">176.000</span> TND</span></div>
             <div class="const-row"><span>Avantage nature assurance (7.55% du Brut)</span><span class="const-value"><span id="outAssuranceConst">0.000</span> TND</span></div>
         </details>
@@ -745,10 +755,10 @@
             <div class="ledger-row"><span class="desc">Indemnité de présence</span><span class="amount">6.080 TND</span></div>
             <div class="ledger-row"><span class="desc">Indemnité de transport</span><span class="amount">20.000 TND</span></div>
             <div class="ledger-row"><span class="desc">Prime conventionnelle d'assiduité</span><span class="amount"><span id="outAssiduite">220.000</span> TND</span></div>
-            <div class="ledger-row"><span class="desc">Prime de langue anglais</span><span class="amount">250.000 TND</span></div>
+            <div class="ledger-row"><span class="desc">Prime de langue anglais</span><span class="amount"><span id="outLangue">250.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Prime mensuelle de productivité</span><span class="amount"><span id="outProductivite">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Majoration heures de nuit<span class="base"><span id="outBaseNuit">0.000</span> Hrs</span></span><span class="amount"><span id="outGainNuit">0.000</span> TND</span></div>
-            <div class="ledger-row"><span class="desc">Prime dimanche travaillé<span class="base"><span id="outBaseDim">0.000</span> Jrs</span></span><span class="amount"><span id="outGainDim">0.000</span> TND</span></div>
+            <div class="ledger-row"><span class="desc">Prime dimanche travaillé<span class="base"><span id="outBaseDim">0.000</span> Nbr</span></span><span class="amount"><span id="outGainDim">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Jours fériés rémunérés (150%)<span class="base"><span id="outBaseFerie">0.000</span> Jrs</span></span><span class="amount"><span id="outGainFerie">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Heures supplémentaires (125%)<span class="base"><span id="outBaseSup125">0.000</span> Hrs</span></span><span class="amount"><span id="outGainSup125">0.000</span> TND</span></div>
             <div class="ledger-row"><span class="desc">Heures supplémentaires (150%)<span class="base"><span id="outBaseSup150">0.000</span> Hrs</span></span><span class="amount"><span id="outGainSup150">0.000</span> TND</span></div>
@@ -792,7 +802,7 @@
         <div class="hero-card hero-card-bottom" id="heroBottom">
             <div class="hero-top">
                 <span class="hero-brand">Concentrix</span>
-                <span class="hero-badge">Mise à jour en temps réel</span>
+                <span class="hero-badge">Temps réel</span>
             </div>
             <p class="hero-label">Net à payer estimé</p>
             <div class="hero-value"><span id="outNetAPayerHero2">0.000</span><span class="hero-unit">TND</span></div>
@@ -823,42 +833,45 @@
 </div>
 
 <script>
+/* ============================================================================
+   CALCULATEUR DE SALAIRE — CONCENTRIX
+   ----------------------------------------------------------------------------
+   Sommaire :
+     1. CONSTANTES DE PAIE (taux, barèmes, montants fixes)
+     2. RÉFÉRENCES DOM (tous les champs de saisie)
+     3. GÉNÉRATION DYNAMIQUE — semaines d'absence (Semaine 1 à 4)
+     4. MOTEUR FISCAL — barème IRPP par tranches
+     5. FONCTIONS DE CALCUL — une fonction par bloc du bulletin
+     6. ORCHESTRATION — calculateSalary() appelle les fonctions ci-dessus
+     7. AFFICHAGE — mise à jour du DOM avec les résultats
+     8. ÉVÉNEMENTS — recalcul en temps réel à chaque saisie
+     9. UI — boutons +/- (steppers) et navigation par onglets
+     10. INITIALISATION
+   ============================================================================ */
 
-    // Éléments Constantes Ajustables et Fixes
 
+    /* ===== 1. CONSTANTES DE PAIE ===== */
+    const NB_SEMAINES = 4;                     // Mois calculé sur 4 semaines fixes
+    const PRIME_ASSIDUITE_TOTAL = 220.000;     // Prime totale répartie sur les semaines
+    const JOURS_TR_BASE = 22;                  // Jours travaillés de référence (avantage TR)
+    const VALEUR_JOURNALIERE_TR = 8.000;       // TND / jour travaillé pour l'avantage TR
+    const PRESENCE_INDEMNITY = 6.080;          // Indemnité de présence (fixe)
+    const TRANSPORT_INDEMNITY = 20.000;        // Indemnité de transport (fixe)
+    const LANGUE_PRIME = 250.000;              // Prime de langue anglaise (fixe)
+    const PRIME_DIMANCHE = 25.000;             // TND / dimanche travaillé
+    const TAUX_CNSS = 0.0968;                  // Cotisation salariale CNSS (9.68%)
+    const TAUX_ASSURANCE = 0.0755;             // Assurance groupe = 7.55% du Brut
+    const TAUX_CSS = 0.005;                    // Contribution sociale de solidarité (0.5%)
+    const PLAFOND_FRAIS_PRO = 2000.000;        // Plafond annuel des frais professionnels
+    const DEDUCTION_PAR_ENFANT = 100.000;      // TND / enfant à charge, dans la limite de :
+    const MAX_ENFANTS_DEDUCTIBLES = 4;
+    const SALAIRE_BASE_REFERENCE = 823.248;    // Salaire de référence pour les taux proportionnels
+
+
+    /* ===== 2. RÉFÉRENCES DOM ===== */
     const inBaseSalary = document.getElementById('baseSalaryInput');
     const weeksContainer = document.getElementById('weeksContainer');
-    const NB_SEMAINES = 4;
-    const PRIME_ASSIDUITE_TOTAL = 220.000;
-    const JOURS_TR_BASE = 22;
-    const VALEUR_JOURNALIERE_TR = 8.000;
-    const PRESENCE_INDEMNITY = 6.080;
-    const TRANSPORT_INDEMNITY = 20.000;
-    const LANGUE_PRIME = 250.000;
-    const PRIME_DIMANCHE = 25.000;
 
-    function renderWeekInputs() {
-        const n = NB_SEMAINES;
-        const previousValues = Array.from(weeksContainer.querySelectorAll('input')).map(i => i.value);
-        weeksContainer.innerHTML = '';
-        for (let i = 0; i < n; i++) {
-            const row = document.createElement('div');
-            row.className = 'field-control';
-            row.innerHTML = `
-                <span style="min-width:76px; font-size:13px; color:var(--text-soft);">Semaine ${i + 1}</span>
-                <input type="number" class="week-abs-input" data-week="${i}" value="${previousValues[i] || '0.000'}" step="0.001" min="0" inputmode="decimal">
-                <span class="unit">Jrs</span>
-            `;
-            weeksContainer.appendChild(row);
-        }
-        // Réattacher les écouteurs sur les nouveaux champs générés
-        weeksContainer.querySelectorAll('.week-abs-input').forEach(inp => {
-            inp.addEventListener('input', calculateSalary);
-            inp.addEventListener('change', calculateSalary);
-        });
-    }
-
-    // Inputs Éléments de Paie du Mois
     const inHeuresNuit = document.getElementById('heuresNuit');
     const inDimanches = document.getElementById('dimanchesTravailles');
     const inJoursFeries = document.getElementById('joursFeries');
@@ -870,13 +883,40 @@
     const inAvances = document.getElementById('avances');
     const inPertes = document.getElementById('deteriorations');
 
-    // Inputs Situation Familiale
     const inSituationMaritale = document.getElementById('situationMaritale');
     const inEnfantsACharge = document.getElementById('enfantsACharge');
+    const inLangueEligible = document.getElementById('langueEligible');
 
-    // Moteur de calcul IRPP par tranche progressive (Législation Tunisienne officielle)
+
+    /* ===== 3. GÉNÉRATION DYNAMIQUE — semaines d'absence =====
+       Crée les 4 champs "Semaine 1" à "Semaine 4" au lieu de les écrire
+       en dur dans le HTML, et branche le recalcul automatique dessus. */
+    function renderWeekInputs() {
+        const previousValues = Array.from(weeksContainer.querySelectorAll('input')).map(i => i.value);
+        weeksContainer.innerHTML = '';
+
+        for (let i = 0; i < NB_SEMAINES; i++) {
+            const row = document.createElement('div');
+            row.className = 'field-control';
+            row.innerHTML = `
+                <span style="min-width:76px; font-size:13px; color:var(--text-soft);">Semaine ${i + 1}</span>
+                <input type="number" class="week-abs-input" data-week="${i}" value="${previousValues[i] || '0.000'}" step="0.001" inputmode="decimal">
+                <span class="unit">Jrs</span>
+            `;
+            weeksContainer.appendChild(row);
+        }
+
+        weeksContainer.querySelectorAll('.week-abs-input').forEach(inp => {
+            inp.addEventListener('input', calculateSalary);
+            inp.addEventListener('change', calculateSalary);
+        });
+    }
+
+
+    /* ===== 4. MOTEUR FISCAL — barème IRPP par tranches progressives
+       (législation tunisienne : 0% jusqu'à 5000 DT/an, puis 15%, 25%, 30%,
+       33%, 36%, 38%, et 40% au-delà de 70 000 DT/an) ===== */
     function calculerIrppAnnuel(revenuNetImposable) {
-        let impot = 0;
         const tranches = [
             { limite: 5000, taux: 0.00 },
             { limite: 10000, taux: 0.15 },
@@ -888,200 +928,267 @@
             { limite: Infinity, taux: 0.40 }
         ];
 
+        let impot = 0;
         let revenuRestant = revenuNetImposable;
         let limitePrecedente = 0;
 
-        for (let i = 0; i < tranches.length; i++) {
-            let largeurTranche = tranches[i].limite - limitePrecedente;
-            
+        for (const tranche of tranches) {
+            const largeurTranche = tranche.limite - limitePrecedente;
             if (revenuRestant > largeurTranche) {
-                impot += largeurTranche * tranches[i].taux;
+                impot += largeurTranche * tranche.taux;
                 revenuRestant -= largeurTranche;
-                limitePrecedente = tranches[i].limite;
+                limitePrecedente = tranche.limite;
             } else {
-                impot += revenuRestant * tranches[i].taux;
+                impot += revenuRestant * tranche.taux;
                 break;
             }
         }
         return impot;
     }
 
-    function calculateSalary() {
-        // Extraction dynamique du salaire de base courant
-        const currentBaseSalary = parseFloat(inBaseSalary.value) || 0;
-        // Constantes désormais éditables : à saisir depuis le vrai bulletin du mois
-        
-        // Ajustement dynamique des taux de base proportionnels au salaire de base (pour 170.667 heures standard ou taux d'origine)
-        // Ratio par rapport à la base d'origine 823.248
-        const ratio = currentBaseSalary / 823.248;
-        const tauxHoraireBase = 4.826 * ratio;
-        const tauxMajorationNuit = 2.413 * ratio;
-        const tauxJournalierBase = 38.606 * ratio;
 
-        const hrsNuit = parseFloat(inHeuresNuit.value) || 0;
-        const nbrDim = parseFloat(inDimanches.value) || 0;
-        const jFeries = parseFloat(inJoursFeries.value) || 0;
-        const hSup125 = parseFloat(inHSup125.value) || 0;
-        const hSup150 = parseFloat(inHSup150.value) || 0;
-        const hrsWfm = parseFloat(inWfm.value) || 0;
-        const pctProd = parseFloat(inProductivite.value) || 0;
-        const valRappels = parseFloat(inRappels.value) || 0;
-        // Absences saisies par semaine : chaque champ "week-abs-input" donne le nombre
-        // de jours d'absence pour cette semaine-là.
+    /* ===== 5. FONCTIONS DE CALCUL =====
+       Chaque fonction fait un seul travail et retourne un objet simple.
+       calculateSalary() (section 6) les enchaîne dans l'ordre. */
+
+    // 5.1 — Lit tous les champs de saisie et renvoie leurs valeurs numériques
+    function lireLesSaisies() {
         const weekAbsInputs = Array.from(weeksContainer.querySelectorAll('.week-abs-input'));
         const weekAbsValues = weekAbsInputs.map(inp => parseFloat(inp.value) || 0);
-        const jAbs = weekAbsValues.reduce((sum, v) => sum + v, 0); // total jours d'absence (retenue sur brut)
-        const nbSemainesAvecAbsence = weekAbsValues.filter(v => v >= 1).length;
-        const nbSemainesTotal = weekAbsValues.length;
-        // Avantage en nature TR : 8.000 TND / jour, sur la base de 22 jours travaillés,
-        // impacté par le total des jours d'absence saisis (affichage seulement — n'existe
-        // qu'en tant que ligne de gain puis de reprise, sans impact net sur le calcul global).
-        const AV_TR = Math.max(0, JOURS_TR_BASE - jAbs) * VALEUR_JOURNALIERE_TR;
-        const valAvances = parseFloat(inAvances.value) || 0;
-        const valPertes = parseFloat(inPertes.value) || 0;
 
-        // Récupération dynamique des déductions fiscales familiales
-        const deductionChefFamille = parseFloat(inSituationMaritale.value) || 0;
-        const nbrEnfants = Math.min(parseInt(inEnfantsACharge.value) || 0, 4); // Max 4 enfants légalement
-        const deductionEnfants = nbrEnfants * 100.000; 
-
-        // Règle Prime de Productivité sur la base dynamique
-        const valProd = currentBaseSalary * pctProd;
-
-        // Prime d'assiduité par tranches hebdomadaires : 55.000 TND par semaine
-        // sans absence (0 jour). Une semaine avec >=1 jour d'absence perd sa tranche.
-        // Le nombre d'heures manquantes (WFM) n'intervient PAS dans ce calcul :
-        // seules les absences par semaine affectent l'assiduité.
-        // Tranche hebdomadaire fixe : 220.000 TND ÷ 4 semaines = 55.000 TND/semaine
-        const trancheAssiduite = PRIME_ASSIDUITE_TOTAL / NB_SEMAINES;
-        const currentAssiduitePrime = (nbSemainesTotal - nbSemainesAvecAbsence) * trancheAssiduite;
-
-        // Éléments Variables de gain
-        const gainNuit = hrsNuit * tauxMajorationNuit;
-        const gainDim = nbrDim * PRIME_DIMANCHE;
-        const gainFerie = jFeries * tauxJournalierBase * 1.5;
-        const gainSup125 = hSup125 * tauxHoraireBase * 1.25;
-        const gainSup150 = hSup150 * tauxHoraireBase * 1.5;
-        
-        // Éléments Variables de retenue sur brut
-        // "Jours d'absence" (Rappel Nbr de jours) : au taux journalier
-        const retenueAbs = jAbs * tauxJournalierBase;
-        // "Heures manquantes (WFM)" : au taux horaire, car saisi en heures (pas en jours)
-        const retenueWfm = hrsWfm * tauxHoraireBase;
-
-        // Assurance Groupe : base = Brut (hors assurance elle-même) × 7.55%
-        // (formule observée sur les bulletins Concentrix)
-        const baseAssurance = (
-            currentBaseSalary +
-            PRESENCE_INDEMNITY +
-            TRANSPORT_INDEMNITY +
-            currentAssiduitePrime +
-            LANGUE_PRIME +
-            valProd +
-            gainNuit +
-            gainDim +
-            gainFerie +
-            gainSup125 +
-            gainSup150 +
-            valRappels +
-            AV_TR -
-            retenueAbs -
-            retenueWfm
-        );
-        const av_ass = baseAssurance * 0.0755;
-
-        // Calcul du Salaire Brut Global
-        const totalBrut = baseAssurance + av_ass;
-
-        // Base de cotisation CNSS et calcul de la charge salariale (9.68%)
-        const baseCnss = totalBrut - AV_TR - av_ass;
-        const cnss = baseCnss * 0.0968;
-
-        // Définition de la Base imposable mensuelle
-        const salaireImposable = totalBrut - cnss; 
-
-        // --- MOTEUR FISCAL ANNUEL ---
-        const salaireImposableAnnuel = salaireImposable * 12;
-        
-        // Déduction Frais Professionnels Forfaitaires (10% plafonné à 2000 DT/an)
-        const fraisProfessionnels = Math.min(salaireImposableAnnuel * 0.10, 2000.000);
-        
-        // Calcul du Revenu Net Imposable Annuel soumis au barème
-        const abattementsFamille = deductionChefFamille + deductionEnfants;
-        const revenuNetImposableAnnuel = Math.max(0, salaireImposableAnnuel - fraisProfessionnels - abattementsFamille);
-
-        // Calcul Final IRPP et CSS ramenés au Mensuel
-        const irpp = calculerIrppAnnuel(revenuNetImposableAnnuel) / 12;
-        const css = (revenuNetImposableAnnuel * 0.005) / 12; 
-
-        // Reste des calculs nets
-        const salaireNet = totalBrut - cnss - irpp - css;
-        const netAPayer = salaireNet - av_ass - valAvances - valPertes - AV_TR;
-
-        // --- AFFICHAGE SYNCHRONISÉ DU BULLETIN ---
-        document.getElementById('outAssuranceConst').innerText = av_ass.toFixed(3);
-        document.getElementById('outSalaireBase').innerText = currentBaseSalary.toFixed(3);
-        document.getElementById('outAssiduite').innerText = currentAssiduitePrime.toFixed(3);
-        document.getElementById('outAssiduiteConst').innerText = currentAssiduitePrime.toFixed(3);
-        document.getElementById('hintTranche').innerText = `Une tranche d'assiduité de ${trancheAssiduite.toFixed(3)} TND est perdue pour chaque semaine où au moins 1 jour d'absence est saisi.`;
-        document.getElementById('outProductivite').innerText = valProd.toFixed(3);
-        document.getElementById('outBaseNuit').innerText = hrsNuit.toFixed(3);
-        document.getElementById('outGainNuit').innerText = gainNuit.toFixed(3);
-        document.getElementById('outBaseDim').innerText = nbrDim.toFixed(3);
-        document.getElementById('outGainDim').innerText = gainDim.toFixed(3);
-        document.getElementById('outBaseFerie').innerText = jFeries.toFixed(3);
-        document.getElementById('outGainFerie').innerText = gainFerie.toFixed(3);
-        document.getElementById('outBaseSup125').innerText = hSup125.toFixed(3);
-        document.getElementById('outGainSup125').innerText = gainSup125.toFixed(3);
-        document.getElementById('outBaseSup150').innerText = hSup150.toFixed(3);
-        document.getElementById('outGainSup150').innerText = gainSup150.toFixed(3);
-        
-        document.getElementById('outRetenueAbs').innerText = retenueAbs.toFixed(3);
-        document.getElementById('outRappels').innerText = valRappels.toFixed(3);
-        document.getElementById('outBaseWfm').innerText = hrsWfm.toFixed(3);
-        document.getElementById('outRetenueWFM').innerText = retenueWfm.toFixed(3);
-        
-        document.getElementById('outTotalBrut').innerText = totalBrut.toFixed(3);
-        document.getElementById('outBaseCnss').innerText = baseCnss.toFixed(3);
-        document.getElementById('outCnss').innerText = cnss.toFixed(3);
-        
-        document.getElementById('outBaseIrpp').innerText = salaireImposable.toFixed(3);
-        document.getElementById('outIrpp').innerText = irpp.toFixed(3);
-        document.getElementById('outCss').innerText = css.toFixed(3);
-        
-        document.getElementById('outGainAssurance').innerText = av_ass.toFixed(3);
-        document.getElementById('outSalaireNet').innerText = salaireNet.toFixed(3);
-        document.getElementById('outRetenueAvance').innerText = valAvances.toFixed(3);
-        document.getElementById('outRetenuePertes').innerText = valPertes.toFixed(3);
-        document.getElementById('outRetenueAssurance').innerText = av_ass.toFixed(3);
-        document.getElementById('outAvTrGain').innerText = AV_TR.toFixed(3);
-        document.getElementById('outAvTrRetenue').innerText = AV_TR.toFixed(3);
-        document.getElementById('outAvTrConst').innerText = AV_TR.toFixed(3);
-        document.getElementById('outNetAPayer').innerText = netAPayer.toFixed(3);
-
-        // Miroirs d'affichage pour la carte de résumé en tête d'écran (interface uniquement, calcul inchangé)
-        document.getElementById('outNetAPayerHero').innerText = netAPayer.toFixed(3);
-        document.getElementById('outTotalBrutHero').innerText = totalBrut.toFixed(3);
-        document.getElementById('outRetenuesHero').innerText = (totalBrut - netAPayer).toFixed(3);
-        document.getElementById('outNetAPayerHero2').innerText = netAPayer.toFixed(3);
-        document.getElementById('outTotalBrutHero2').innerText = totalBrut.toFixed(3);
-        document.getElementById('outRetenuesHero2').innerText = (totalBrut - netAPayer).toFixed(3);
+        return {
+            baseSalary: parseFloat(inBaseSalary.value) || 0,
+            hrsNuit: parseFloat(inHeuresNuit.value) || 0,
+            nbrDim: parseFloat(inDimanches.value) || 0,
+            jFeries: parseFloat(inJoursFeries.value) || 0,
+            hSup125: parseFloat(inHSup125.value) || 0,
+            hSup150: parseFloat(inHSup150.value) || 0,
+            hrsWfm: parseFloat(inWfm.value) || 0,
+            pctProd: parseFloat(inProductivite.value) || 0,
+            valRappels: parseFloat(inRappels.value) || 0,
+            valAvances: parseFloat(inAvances.value) || 0,
+            valPertes: parseFloat(inPertes.value) || 0,
+            deductionChefFamille: parseFloat(inSituationMaritale.value) || 0,
+            nbrEnfants: Math.min(parseInt(inEnfantsACharge.value) || 0, MAX_ENFANTS_DEDUCTIBLES),
+            langueEligible: inLangueEligible.checked,
+            weekAbsValues: weekAbsValues,
+            jAbs: weekAbsValues.reduce((sum, v) => sum + v, 0),
+            nbSemainesAvecAbsence: weekAbsValues.filter(v => v >= 1).length,
+            nbSemainesTotal: weekAbsValues.length
+        };
     }
 
-    // Écouteurs d'événements globaux pour mise à jour en temps réel
+    // 5.2 — Taux horaire/journalier, proportionnels au salaire de base saisi
+    function calculerTauxProportionnels(baseSalary) {
+        const ratio = baseSalary / SALAIRE_BASE_REFERENCE;
+        return {
+            tauxHoraireBase: 4.826 * ratio,
+            tauxMajorationNuit: 2.413 * ratio,
+            tauxJournalierBase: 38.606 * ratio
+        };
+    }
+
+    // 5.3 — Avantage en nature TR : 8 TND/jour sur la base de 22 jours travaillés
+    function calculerAvantageTR(jAbs) {
+        return Math.max(0, JOURS_TR_BASE - jAbs) * VALEUR_JOURNALIERE_TR;
+    }
+
+    // 5.4 — Prime d'assiduité : 220 TND répartis en tranches hebdomadaires.
+    // Une semaine avec ≥1 jour d'absence fait perdre sa tranche.
+    function calculerPrimeAssiduite(nbSemainesTotal, nbSemainesAvecAbsence) {
+        const trancheAssiduite = PRIME_ASSIDUITE_TOTAL / NB_SEMAINES;
+        return {
+            trancheAssiduite: trancheAssiduite,
+            currentAssiduitePrime: (nbSemainesTotal - nbSemainesAvecAbsence) * trancheAssiduite
+        };
+    }
+
+    // 5.5 — Gains variables du mois (heures de nuit, dimanches, fériés, heures sup)
+    function calculerGainsVariables(saisies, taux) {
+        return {
+            gainNuit: saisies.hrsNuit * taux.tauxMajorationNuit,
+            gainDim: saisies.nbrDim * PRIME_DIMANCHE,
+            gainFerie: saisies.jFeries * taux.tauxJournalierBase * 1.5,
+            gainSup125: saisies.hSup125 * taux.tauxHoraireBase * 1.25,
+            gainSup150: saisies.hSup150 * taux.tauxHoraireBase * 1.5
+        };
+    }
+
+    // 5.6 — Retenues variables sur le brut (absences en jours, WFM en heures)
+    function calculerRetenuesVariables(saisies, taux) {
+        return {
+            retenueAbs: saisies.jAbs * taux.tauxJournalierBase,
+            retenueWfm: saisies.hrsWfm * taux.tauxHoraireBase
+        };
+    }
+
+    // 5.7 — Assurance groupe (7.55% du Brut hors assurance) puis Brut total.
+    // Calcul en 2 temps car l'assurance dépend elle-même du brut.
+    function calculerAssuranceEtBrut(saisies, taux, primeAssiduite, gains, retenues, avTr, valProd, valLangue) {
+        const baseAssurance = (
+            saisies.baseSalary +
+            PRESENCE_INDEMNITY +
+            TRANSPORT_INDEMNITY +
+            primeAssiduite.currentAssiduitePrime +
+            valLangue +
+            valProd +
+            gains.gainNuit +
+            gains.gainDim +
+            gains.gainFerie +
+            gains.gainSup125 +
+            gains.gainSup150 +
+            saisies.valRappels +
+            avTr -
+            retenues.retenueAbs -
+            retenues.retenueWfm
+        );
+        const av_ass = baseAssurance * TAUX_ASSURANCE;
+
+        return {
+            baseAssurance: baseAssurance,
+            av_ass: av_ass,
+            totalBrut: baseAssurance + av_ass
+        };
+    }
+
+    // 5.8 — Cotisation salariale CNSS (9.68%), hors avantages en nature
+    function calculerCnss(totalBrut, avTr, av_ass) {
+        const baseCnss = totalBrut - avTr - av_ass;
+        return {
+            baseCnss: baseCnss,
+            cnss: baseCnss * TAUX_CNSS
+        };
+    }
+
+    // 5.9 — IRPP (barème annuel ramené au mois) et CSS (0.5%)
+    function calculerImpots(salaireImposable, saisies) {
+        const salaireImposableAnnuel = salaireImposable * 12;
+        const fraisProfessionnels = Math.min(salaireImposableAnnuel * 0.10, PLAFOND_FRAIS_PRO);
+        const abattementsFamille = saisies.deductionChefFamille + (saisies.nbrEnfants * DEDUCTION_PAR_ENFANT);
+        const revenuNetImposableAnnuel = Math.max(0, salaireImposableAnnuel - fraisProfessionnels - abattementsFamille);
+
+        return {
+            salaireImposableAnnuel: salaireImposableAnnuel,
+            revenuNetImposableAnnuel: revenuNetImposableAnnuel,
+            irpp: calculerIrppAnnuel(revenuNetImposableAnnuel) / 12,
+            css: (revenuNetImposableAnnuel * TAUX_CSS) / 12
+        };
+    }
+
+    // 5.10 — Salaire net puis Net à payer (les avantages en nature sont
+    // retirés en fin de chaîne : ce ne sont pas des sommes versées en cash)
+    function calculerNet(totalBrut, cnss, irpp, css, av_ass, avTr, saisies) {
+        const salaireNet = totalBrut - cnss - irpp - css;
+        const netAPayer = salaireNet - av_ass - saisies.valAvances - saisies.valPertes - avTr;
+        return { salaireNet, netAPayer };
+    }
+
+
+    /* ===== 6. ORCHESTRATION =====
+       Enchaîne toutes les fonctions de calcul dans l'ordre, puis
+       transmet le résultat final à la fonction d'affichage (section 7). */
+    function calculateSalary() {
+        const saisies = lireLesSaisies();
+        const taux = calculerTauxProportionnels(saisies.baseSalary);
+
+        const avTr = calculerAvantageTR(saisies.jAbs);
+        const valProd = saisies.baseSalary * saisies.pctProd;
+        const valLangue = saisies.langueEligible ? LANGUE_PRIME : 0;
+        const primeAssiduite = calculerPrimeAssiduite(saisies.nbSemainesTotal, saisies.nbSemainesAvecAbsence);
+
+        const gains = calculerGainsVariables(saisies, taux);
+        const retenues = calculerRetenuesVariables(saisies, taux);
+
+        const { av_ass, totalBrut } = calculerAssuranceEtBrut(saisies, taux, primeAssiduite, gains, retenues, avTr, valProd, valLangue);
+        const { baseCnss, cnss } = calculerCnss(totalBrut, avTr, av_ass);
+
+        const salaireImposable = totalBrut - cnss;
+        const { irpp, css } = calculerImpots(salaireImposable, saisies);
+
+        const { salaireNet, netAPayer } = calculerNet(totalBrut, cnss, irpp, css, av_ass, avTr, saisies);
+
+        afficherResultats({
+            saisies, taux, avTr, valProd, valLangue, primeAssiduite, gains, retenues,
+            av_ass, totalBrut, baseCnss, cnss, salaireImposable, irpp, css,
+            salaireNet, netAPayer
+        });
+    }
+
+
+    /* ===== 7. AFFICHAGE — pousse chaque résultat calculé vers le DOM ===== */
+    function afficherResultats(r) {
+        const set = (id, value) => { document.getElementById(id).innerText = value.toFixed(3); };
+
+        set('outAssuranceConst', r.av_ass);
+        set('outSalaireBase', r.saisies.baseSalary);
+        set('outAssiduite', r.primeAssiduite.currentAssiduitePrime);
+        set('outAssiduiteConst', r.primeAssiduite.currentAssiduitePrime);
+        document.getElementById('hintTranche').innerText =
+            `Une tranche d'assiduité de ${r.primeAssiduite.trancheAssiduite.toFixed(3)} TND est perdue pour chaque semaine où au moins 1 jour d'absence est saisi.`;
+
+        set('outProductivite', r.valProd);
+        set('outLangue', r.valLangue);
+
+        set('outBaseNuit', r.saisies.hrsNuit);
+        set('outGainNuit', r.gains.gainNuit);
+        set('outBaseDim', r.saisies.nbrDim);
+        set('outGainDim', r.gains.gainDim);
+        set('outBaseFerie', r.saisies.jFeries);
+        set('outGainFerie', r.gains.gainFerie);
+        set('outBaseSup125', r.saisies.hSup125);
+        set('outGainSup125', r.gains.gainSup125);
+        set('outBaseSup150', r.saisies.hSup150);
+        set('outGainSup150', r.gains.gainSup150);
+
+        set('outRetenueAbs', r.retenues.retenueAbs);
+        set('outRappels', r.saisies.valRappels);
+        set('outBaseWfm', r.saisies.hrsWfm);
+        set('outRetenueWFM', r.retenues.retenueWfm);
+
+        set('outTotalBrut', r.totalBrut);
+        set('outBaseCnss', r.baseCnss);
+        set('outCnss', r.cnss);
+
+        set('outBaseIrpp', r.salaireImposable);
+        set('outIrpp', r.irpp);
+        set('outCss', r.css);
+
+        set('outGainAssurance', r.av_ass);
+        set('outSalaireNet', r.salaireNet);
+        set('outRetenueAvance', r.saisies.valAvances);
+        set('outRetenuePertes', r.saisies.valPertes);
+        set('outRetenueAssurance', r.av_ass);
+        set('outAvTrGain', r.avTr);
+        set('outAvTrRetenue', r.avTr);
+        set('outAvTrConst', r.avTr);
+        set('outNetAPayer', r.netAPayer);
+
+        // Miroirs pour les deux cartes "hero" (haut de page mobile + bas de page bureau)
+        set('outNetAPayerHero', r.netAPayer);
+        set('outTotalBrutHero', r.totalBrut);
+        set('outRetenuesHero', r.totalBrut - r.netAPayer);
+        set('outNetAPayerHero2', r.netAPayer);
+        set('outTotalBrutHero2', r.totalBrut);
+        set('outRetenuesHero2', r.totalBrut - r.netAPayer);
+    }
+
+
+    /* ===== 8. ÉVÉNEMENTS — recalcul en temps réel ===== */
     const allInputs = [
-        inBaseSalary, inHeuresNuit, inDimanches, inJoursFeries, inHSup125, inHSup150, 
+        inBaseSalary, inHeuresNuit, inDimanches, inJoursFeries, inHSup125, inHSup150,
         inWfm, inProductivite, inRappels, inAvances, inPertes,
-        inSituationMaritale, inEnfantsACharge
+        inSituationMaritale, inEnfantsACharge, inLangueEligible
     ];
-    
+
     allInputs.forEach(input => {
         input.addEventListener('input', calculateSalary);
         input.addEventListener('change', calculateSalary);
     });
 
-    // Génération des champs de semaine (fixé à 4 semaines) puis calcul initial
-    // Injection automatique des boutons +/- (stepper) sur tous les champs numériques
+
+    /* ===== 9. UI — boutons +/- (steppers) =====
+       Injecte automatiquement 2 boutons (▲▼) après chaque champ numérique,
+       en respectant son step / min / max, sans dupliquer le HTML à la main. */
     function attachSteppers(root) {
         (root || document).querySelectorAll('.field-control input[type="number"]').forEach(inp => {
             if (inp.dataset.stepperAttached) return;
@@ -1121,32 +1228,44 @@
         });
     }
 
+
+    /* ===== 9bis. UI — navigation par onglets (Saisie / Bulletin) ===== */
+    function initNavigation() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const screens = {
+            'screen-saisie': document.getElementById('screen-saisie'),
+            'screen-bulletin': document.getElementById('screen-bulletin')
+        };
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-target');
+                tabButtons.forEach(b => b.classList.toggle('active', b === btn));
+
+                Object.keys(screens).forEach(key => {
+                    const el = screens[key];
+                    if (key === target) {
+                        el.hidden = false;
+                        el.classList.remove('enter');
+                        void el.offsetWidth; // relance l'animation d'entrée
+                        el.classList.add('enter');
+                    } else {
+                        el.hidden = true;
+                    }
+                });
+
+                window.scrollTo(0, 0);
+            });
+        });
+    }
+
+
+    /* ===== 10. INITIALISATION ===== */
     renderWeekInputs();
     calculateSalary();
     attachSteppers();
-
-    // ===== Navigation par onglets =====
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const screens = { 'screen-saisie': document.getElementById('screen-saisie'), 'screen-bulletin': document.getElementById('screen-bulletin') };
-
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const target = btn.getAttribute('data-target');
-            tabButtons.forEach(b => b.classList.toggle('active', b === btn));
-            Object.keys(screens).forEach(key => {
-                const el = screens[key];
-                if (key === target) {
-                    el.hidden = false;
-                    el.classList.remove('enter');
-                    void el.offsetWidth;
-                    el.classList.add('enter');
-                } else {
-                    el.hidden = true;
-                }
-            });
-            window.scrollTo(0, 0);
-        });
-    });
+    initNavigation();
 </script>
+
 </body>
 </html>
