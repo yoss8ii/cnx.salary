@@ -577,6 +577,14 @@
     }
 
     /* ===== Contact / réseaux sociaux ===== */
+    .app-footer {
+        text-align: center;
+        padding: 24px 16px 150px;
+        font-size: 11px;
+        color: var(--text-faint);
+        line-height: 1.6;
+    }
+
     .contact-wrap {
         display: flex;
         justify-content: center;
@@ -660,6 +668,7 @@
 
         /* Barre d'onglets flottante inutile en version bureau */
         .tabbar-float { display: none; }
+        .app-footer { padding-bottom: 24px; }
 
         .step, .ledger-group, .ledger-total {
             transition: border-color 0.15s ease;
@@ -905,7 +914,7 @@
         </div>
     </div>
     </main>
-    <footer style="text-align:center; padding:24px 16px 90px; font-size:11px; color:var(--text-faint); line-height:1.6;">
+    <footer class="app-footer">
         Développée par Yosri GHAMMOURI™ <br>
             © 2026 • Tout droit réservé.
 
